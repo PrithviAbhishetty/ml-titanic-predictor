@@ -53,6 +53,10 @@ def train():
         targets='Survived'
     )
 
+    # Get Git repo URL for tagging
+    repo = Repo(search_parent_directories=True)
+    repo_url = repo.remotes.origin.url
+
     # Create MLflow experiment
     mlflow.set_experiment('titanic-survival')
 
