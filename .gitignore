@@ -1,0 +1,28 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/*.csv
+
+# Environment variables
+.env
+
+# OS
+.DS_Store
+
+# Node
+node_modules/
+dist/
