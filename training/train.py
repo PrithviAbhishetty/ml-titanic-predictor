@@ -1,4 +1,3 @@
-import subprocess
 import pandas as pd
 import mlflow
 import mlflow.sklearn
@@ -7,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from xgboost import XGBClassifier
+from git import Repo
 
 def preprocess(df):
     df = df.drop(columns=['PassengerId', 'Name', 'Ticket', 'Cabin'])
@@ -65,9 +65,8 @@ def train():
             accuracy = accuracy_score(y_test, predictions)
             f1 = f1_score(y_test, predictions)
 
-            repo_url = subprocess.check_output(
-                ["git", "config", "--get", "remote.origin.url"]
-            ).decode("utf-8").strip()
+            repo = Repo(search_parent_directories=True)
+            repo_url = repo.remotes.origin.url
 
             # Log model name and hyperparameters
             mlflow.log_param('model', model_name)
