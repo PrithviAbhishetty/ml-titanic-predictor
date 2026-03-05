@@ -11,6 +11,9 @@ mlruns/
 mlartifacts/
 mlflow.db
 
+# Models
+models/*.joblib
+
 # Jupyter
 .ipynb_checkpoints/
 
