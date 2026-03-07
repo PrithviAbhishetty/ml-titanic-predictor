@@ -20,7 +20,8 @@ def preprocess(df):
     return df
 
 def train():
-    df = pd.read_csv('../data/titanic.csv')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(os.path.join(BASE_DIR, '../data/titanic.csv'))
     df = preprocess(df)
 
     X = df.drop(columns=['Survived'])
@@ -132,8 +133,8 @@ def train():
                 best_run_id = mlflow.active_run().info.run_id
 
     # Save best model with joblib for API use
-    os.makedirs('../models', exist_ok=True)
-    joblib.dump(best_model, '../models/best_model.joblib')
+    os.makedirs(os.path.join(BASE_DIR, '../models'), exist_ok=True)
+    joblib.dump(best_model, os.path.join(BASE_DIR, '../models/best_model.joblib'))
     print(f'\nBest model run ID: {best_run_id} with CV F1 Mean: {best_f1:.3f}')
     print(f'Best model saved to ../models/best_model.joblib')
 
