@@ -33,6 +33,12 @@ jobs:
                 path: models/
                 key: model-${{ hashFiles('training/train.py') }}
 
+            - name: Download Titanic dataset
+              run: |
+                mkdir -p data
+                curl -L https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv \
+                -o data/titanic.csv
+
             - name: Train model
               if: steps.cache-model.outputs.cache-hit != 'true'
               run: |
