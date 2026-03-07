@@ -1,0 +1,45 @@
+name: Run Tests
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+            
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.14.3'
+
+            - name: Install dependencies
+              run: |
+                pip install uv
+                uv venv
+                source .venv/bin/activate
+                uv pip install -r requirements.txt
+
+            - name: Cache trained model
+              id: cache-model
+              uses: actions/cache@v3
+              with:
+                path: models/
+                key: model-${{ hashFiles('training/train.py') }}
+
+            - name: Train model
+              if: steps.cache-model.outputs.cache-hit != 'true'
+              run: |
+                source .venv/bin/activate
+                cd training && python train.py
+
+            - name: Run tests
+              run: |
+                source .venv/bin/activate
+                pytest tests/
