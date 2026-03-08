@@ -22,6 +22,7 @@ data/*.csv
 
 # Environment variables
 .env
+.env.local
 
 # OS
 .DS_Store
@@ -29,3 +30,7 @@ data/*.csv
 # Node
 node_modules/
 dist/
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
