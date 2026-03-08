@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400&display=swap');
+
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #0f1628;
+  --bg-card: #111827;
+  --accent-ice: #7dd3fc;
+  --accent-gold: #d4a853;
+  --accent-danger: #ef4444;
+  --text-primary: #f0f4ff;
+  --text-muted: #6b7a99;
+  --border: #1e2d45;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(ellipse at 20% 50%, rgba(125, 211, 252, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(212, 168, 83, 0.03) 0%, transparent 60%);
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
