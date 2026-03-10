@@ -7,7 +7,7 @@ import os
 app = FastAPI(
     title="Titanic Survival Predictor",
     description="Predicts whether a Titanic passenger would have survived based on their attributes.",
-    version="1.0.1"
+    version="1.0.2"
 )
 
 app.add_middleware(
