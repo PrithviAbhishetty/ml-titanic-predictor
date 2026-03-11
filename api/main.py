@@ -7,15 +7,15 @@ import os
 app = FastAPI(
     title="Titanic Survival Predictor",
     description="Predicts whether a Titanic passenger would have survived based on their attributes.",
-    version="1.0.1"
+    version="1.0.2"
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origin_regex=r"https://ml-titanic-predictor.*\.vercel\.app|http://localhost:5173",
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
