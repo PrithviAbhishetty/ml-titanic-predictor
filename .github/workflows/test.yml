@@ -41,10 +41,18 @@ jobs:
             - name: Train model
               if: steps.cache-model.outputs.cache-hit != 'true'
               run: |
-                source .venv/bin/activate
-                cd training && python train.py
+                uv run python training/train.py
+
+            - name: Validate model
+              run: |
+                uv run python training/validate.py
 
             - name: Run tests
               run: |
-                source .venv/bin/activate
-                pytest tests/
+                uv run python pytest tests/
+
+            - name: Upload model artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: best-model
+                path: models/best_model.joblib
