@@ -22,6 +22,10 @@ def test_health():
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
+def test_health_head():
+    response = client.head("/health")
+    assert response.status_code == 200
+
 def test_predict_returns_200():
     response = client.post("/predict", json=valid_passenger)
     assert response.status_code == 200
