@@ -27,3 +27,6 @@ local = [
     "seaborn>=0.13.2",
     "jupyter>=1.1.1",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
