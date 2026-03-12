@@ -1,3 +1,4 @@
+# for local development and testing
 services:
   api:
     build: .
