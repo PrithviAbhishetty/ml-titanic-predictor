@@ -21,7 +21,7 @@ def preprocess(df):
     df = pd.get_dummies(df, columns=['Embarked'], drop_first=True, dtype=int)
     return df
 
-def get_best_model():
+def get_best_model(BASE_DIR: str) -> str:
     client = MlflowClient()
     experiment = client.get_experiment_by_name('titanic-survival')
     if experiment is None:
@@ -42,8 +42,8 @@ def get_best_model():
 
     # Load and save the best model
     model = mlflow_sklearn.load_model(f"runs:/{best_run_id}/model")
-    os.makedirs('../models', exist_ok=True)
-    joblib.dump(model, '../models/best_model.joblib')
+    os.makedirs(os.path.join(BASE_DIR, '../models'), exist_ok=True)
+    joblib.dump(model, os.path.join(BASE_DIR, '../models/best_model.joblib'))
 
     return best_run_id
 
@@ -217,7 +217,7 @@ def train():
             print(f'  Confusion Matrix: TN={cm[0][0]}, FP={cm[0][1]}, FN={cm[1][0]}, TP={cm[1][1]}')
 
     # Save best model with joblib for API use
-    best_run_id = get_best_model()
+    best_run_id = get_best_model(BASE_DIR)
     model_version = register_best_model(best_run_id)
     print(f'Best model saved from run: {best_run_id}')
     print(f'Registered as version: {model_version} in Production')
