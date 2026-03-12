@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, '../models/best_model.joblib')
 model_service = ModelService(model_path=MODEL_PATH)
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     if model_service.model is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
