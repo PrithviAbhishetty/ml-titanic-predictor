@@ -12,7 +12,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://ml-titanic-predictor.*\.vercel\.app|http://localhost:5173",
+    allow_origin_regex=r"https://ml-titanic-predictor.*\.vercel\.app|http://localhost:5173|https://ml-titanic-predictor\.onrender\.com",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
