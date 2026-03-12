@@ -1,6 +1,6 @@
 import joblib
 import pandas as pd
-from schemas import PassengerInput
+from api.schemas import PassengerInput
 
 class ModelService:
     def __init__(self, model_path: str):
