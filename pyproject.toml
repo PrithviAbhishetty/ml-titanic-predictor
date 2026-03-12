@@ -15,6 +15,7 @@ dependencies = [
     "numpy>=2.4.2",
     "joblib>=1.5.3",
     "gitpython>=3.1.46",
+    "skops>=0.13.0",
 ]
 
 [project.optional-dependencies]

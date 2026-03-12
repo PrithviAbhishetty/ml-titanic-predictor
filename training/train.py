@@ -85,6 +85,8 @@ def register_best_model(best_run_id: str):
 
 def train():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    mlflow.set_tracking_uri(f"sqlite:///{os.path.join(BASE_DIR, '../mlflow.db')}")
+
     df = pd.read_csv(os.path.join(BASE_DIR, '../data/titanic.csv'))
     df = preprocess(df)
 
@@ -198,7 +200,7 @@ def train():
             mlflow.log_metric('cv_accuracy_mean', cv_accuracy_scores.mean())
             mlflow.log_metric('cv_accuracy_std', cv_accuracy_scores.std())
 
-            mlflow_sklearn.log_model(model, name='model')
+            mlflow_sklearn.log_model(model, name='model', serialization_format='skops')
 
             print(f'{model_name}:')
             print(f'  Holdout  — Accuracy: {accuracy:.3f}, F1: {f1:.3f}, ROC-AUC: {roc_auc:.3f}, Log Loss: {logloss:.3f}')
