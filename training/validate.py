@@ -4,6 +4,7 @@ import joblib
 import pandas as pd
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
+from train import preprocess
 
 F1_THRESHOLD = 0.7
 
@@ -11,9 +12,6 @@ def validate():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     
     df = pd.read_csv(os.path.join(BASE_DIR, '../data/titanic.csv'))
-    
-    # Import preprocess from train.py to avoid duplication
-    from train import preprocess
     df = preprocess(df)
 
     X = df.drop(columns=['Survived'])
