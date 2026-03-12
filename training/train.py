@@ -200,7 +200,16 @@ def train():
             mlflow.log_metric('cv_accuracy_mean', cv_accuracy_scores.mean())
             mlflow.log_metric('cv_accuracy_std', cv_accuracy_scores.std())
 
-            mlflow_sklearn.log_model(model, name='model', serialization_format='skops')
+            mlflow_sklearn.log_model(
+                model, name='model', 
+                serialization_format='skops',
+                skops_trusted_types=[
+                    'xgboost.core.Booster',
+                    'xgboost.sklearn.XGBClassifier',
+                    'sklearn.linear_model._logistic.LogisticRegression',
+                    'sklearn.ensemble._forest.RandomForestClassifier',
+                ]
+                )
 
             print(f'{model_name}:')
             print(f'  Holdout  — Accuracy: {accuracy:.3f}, F1: {f1:.3f}, ROC-AUC: {roc_auc:.3f}, Log Loss: {logloss:.3f}')
