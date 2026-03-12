@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import PassengerInput, PredictionOutput
-from model import ModelService
+from api.schemas import PassengerInput, PredictionOutput
+from api.model import ModelService
 import os
 
 app = FastAPI(
