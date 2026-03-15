@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import joblib
 import mlflow
+import dagshub
 from mlflow import sklearn as mlflow_sklearn
 from mlflow.data.pandas_dataset import from_pandas as mlflow_from_pandas
 from mlflow.tracking import MlflowClient
@@ -47,10 +48,8 @@ def get_best_model(BASE_DIR: str) -> str:
 
     return best_run_id
 
-def register_best_model(best_run_id: str):
+def register_best_model(best_run_id: str, model_uri: str):
     client = MlflowClient()
-
-    model_uri = f"runs:/{best_run_id}/model"
     registered_model = mlflow.register_model(model_uri, "titanic-survival-model")
     new_version = registered_model.version
 
@@ -85,7 +84,7 @@ def register_best_model(best_run_id: str):
 
 def train():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    mlflow.set_tracking_uri(f"sqlite:///{os.path.join(BASE_DIR, '../mlflow.db')}")
+    dagshub.init(repo_owner='PrithviAbhishetty', repo_name='ml-titanic-predictor', mlflow=True)
 
     df = pd.read_csv(os.path.join(BASE_DIR, '../data/titanic.csv'))
     df = preprocess(df)
@@ -114,8 +113,8 @@ def train():
 
     # Create MLflow dataset object
     titanic_dataset = mlflow_from_pandas(
-        df, 
-        source='../data/titanic.csv',
+        df,
+        source=os.path.join(BASE_DIR, '../data/titanic.csv'),
         name='titanic',
         targets='Survived'
     )
@@ -127,8 +126,13 @@ def train():
     # Create MLflow experiment
     mlflow.set_experiment('titanic-survival')
 
+    best_model = None
+    best_cv_f1 = -1
+    best_model_run_id = None
+    best_model_uri = None
+
     for model_name, (model, params) in models.items():
-        with mlflow.start_run(run_name=model_name):
+        with mlflow.start_run(run_name=model_name) as run:
 
             model.fit(X_train, y_train)
             train_predictions = model.predict(X_train)
@@ -200,7 +204,7 @@ def train():
             mlflow.log_metric('cv_accuracy_mean', cv_accuracy_scores.mean())
             mlflow.log_metric('cv_accuracy_std', cv_accuracy_scores.std())
 
-            mlflow_sklearn.log_model(
+            logged_model =mlflow_sklearn.log_model(
                 model, name='model', 
                 serialization_format='skops',
                 skops_trusted_types=[
@@ -209,17 +213,28 @@ def train():
                     'sklearn.linear_model._logistic.LogisticRegression',
                     'sklearn.ensemble._forest.RandomForestClassifier',
                 ]
-                )
+            )
 
             print(f'{model_name}:')
             print(f'  Holdout  — Accuracy: {accuracy:.3f}, F1: {f1:.3f}, ROC-AUC: {roc_auc:.3f}, Log Loss: {logloss:.3f}')
             print(f'  CV       — F1 Mean: {cv_f1_scores.mean():.3f}, F1 Std: {cv_f1_scores.std():.3f}')
             print(f'  Confusion Matrix: TN={cm[0][0]}, FP={cm[0][1]}, FN={cm[1][0]}, TP={cm[1][1]}')
 
-    # Save best model with joblib for API use
-    best_run_id = get_best_model(BASE_DIR)
-    model_version = register_best_model(best_run_id)
-    print(f'Best model saved from run: {best_run_id}')
+            if cv_f1_scores.mean() > best_cv_f1:
+                best_cv_f1 = cv_f1_scores.mean()
+                best_model = model
+                best_model_run_id = run.info.run_id
+                best_model_uri = logged_model.model_uri
+
+    if best_model is None or best_model_run_id is None or best_model_uri is None:
+        raise ValueError("No models were trained successfully")
+    # Save best model directly from memory
+    os.makedirs(os.path.join(BASE_DIR, '../models'), exist_ok=True)
+    joblib.dump(best_model, os.path.join(BASE_DIR, '../models/best_model.joblib'))
+    print(f"Best model saved: CV F1 Mean {best_cv_f1:.3f}")
+
+    model_version = register_best_model(best_model_run_id, best_model_uri)
+    print(f'Best model saved from run: {best_model_run_id}')
     print(f'Registered as version: {model_version} in Production')
 
 if __name__ == '__main__':
