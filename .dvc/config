@@ -2,3 +2,4 @@
     remote = origin
 ['remote "origin"']
     url = https://dagshub.com/PrithviAbhishetty/ml-titanic-predictor.dvc
+    user = PrithviAbhishetty

@@ -40,8 +40,17 @@ jobs:
 
             - name: Train model
               if: steps.cache-model.outputs.cache-hit != 'true'
+              env:
+                DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
               run: |
                 uv run python training/train.py
+
+            - name: Upload model to DagsHub
+              if: steps.cache-model.outputs.cache-hit != 'true'
+              env:
+                DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+              run: |
+                uv run dvc push
 
             - name: Validate model
               run: |
