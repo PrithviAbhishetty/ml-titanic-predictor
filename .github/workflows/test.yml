@@ -61,7 +61,7 @@ jobs:
                 uv run dvc push
 
             - name: Deploy to staging
-              if: github.event_name == 'pull_request' && steps.cache-model.outputs.cache-hit != 'true'
+              if: github.event_name == 'pull_request'
               run: |
                 curl -s -X PATCH \
                   "https://api.render.com/v1/services/${{ secrets.RENDER_STAGING_SERVICE_ID }}" \
