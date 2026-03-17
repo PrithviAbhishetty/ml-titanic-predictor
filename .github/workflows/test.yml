@@ -49,9 +49,13 @@ jobs:
               run: |
                 uv run python training/validate.py
 
-            - name: Run tests
+            - name: Run unit tests
               run: |
                 uv run pytest tests/
+
+            - name: Run integration tests
+              run: |
+                uv run pytest tests/test_integration.py -v
 
             - name: Upload model to DagsHub
               if: steps.cache-model.outputs.cache-hit != 'true'
