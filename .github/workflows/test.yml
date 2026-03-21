@@ -51,7 +51,7 @@ jobs:
 
             - name: Run unit tests
               run: |
-                uv run pytest tests/
+                uv run pytest tests/test_unit.py -v
 
             - name: Run integration tests
               run: |
@@ -78,10 +78,23 @@ jobs:
                   -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY}}" \
                   -H "Content-Type: application/json"
 
+            - name: Get Vercel preview URL
+              if: github.event_name == 'pull_request'
+              id: vercel-url
+              run: |
+                url=$(curl -s "https://api.vercel.com/v6/deployments?projectId=${{ secrets.VERCEL_PROJECT_ID }}&limit=10" \
+                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  | jq -r '[.deployments[] | select(.meta.githubCommitRef == "${{ github.head_ref }}")][0].url')
+                echo "url=https://${url}" >> $GITHUB_OUTPUT
+
+            - name: Install Playwright browsers
+              if: github.event_name == 'pull_request'
+              run: uv run playwright install chromium --with-deps
+
             - name: Run E2E tests
               if: github.event_name == 'pull_request'
               env:
-                E2E_BASE_URL: ${{ env.E2E_BASE_URL }}
-                E2E_BACKEND_URL: ${{ env.E2E_BACKEND_URL }}
+                E2E_BASE_URL: ${{ steps.vercel-url.outputs.url }}
+                E2E_BACKEND_URL: https://ml-titanic-predictor-staging.onrender.com
               run: |
                 uv run pytest tests/test_e2e.py -v
