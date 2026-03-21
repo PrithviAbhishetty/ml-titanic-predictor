@@ -98,3 +98,10 @@ jobs:
                 E2E_BACKEND_URL: https://ml-titanic-predictor-staging.onrender.com
               run: |
                 uv run pytest tests/test_e2e.py -v
+
+            - name: Upload Playwright screenshot
+              if: github.event_name == 'pull_request' && always()
+              uses: actions/upload-artifact@v3
+              with:
+                name: playwright-screenshot
+                path: screenshot.png

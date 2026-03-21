@@ -53,6 +53,7 @@ def test_page_loads(page: Page):
 def test_form_fields_visible(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
+    page.screenshot(path="screenshot.png")
     expect(page.locator("select[name='pclass']")).to_be_visible()
     expect(page.locator("select[name='sex']")).to_be_visible()
     expect(page.locator("input[name='age']")).to_be_visible()
