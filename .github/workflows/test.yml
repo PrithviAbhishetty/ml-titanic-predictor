@@ -77,3 +77,11 @@ jobs:
                   "https://api.render.com/v1/services/${{ secrets.RENDER_STAGING_SERVICE_ID }}/deploys" \
                   -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY}}" \
                   -H "Content-Type: application/json"
+
+            - name: Run E2E tests
+              if: github.event_name == 'pull_request'
+              env:
+                E2E_BASE_URL: ${{ env.E2E_BASE_URL }}
+                E2E_BACKEND_URL: ${{ env.E2E_BACKEND_URL }}
+              run: |
+                uv run pytest tests/test_e2e.py -v
