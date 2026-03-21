@@ -41,16 +41,19 @@ def warmup_backend():
 @pytest.fixture(scope="session", autouse=True)
 def wait_for_frontend():
     print(f"\nWaiting for frontend at {BASE_URL}...")
-    for i in range(8):
+    headers = {}
+    if VERCEL_BYPASS_SECRET:
+        headers["x-vercel-protection-bypass"] = VERCEL_BYPASS_SECRET
+    for i in range(24):
         try:
-            response = httpx.get(BASE_URL, timeout=10)
+            response = httpx.get(BASE_URL, timeout=10, headers=headers, follow_redirects=False)
             if response.status_code == 200:
                 print("Frontend is ready")
                 return
         except Exception:
             pass
-        print(f"Attempt {i+1}: Frontend not ready, waiting 15s...")
-        time.sleep(15)
+        print(f"Attempt {i+1}: Frontend not ready, waiting 5s...")
+        time.sleep(5)
     raise RuntimeError("Frontend failed to become ready within 2 minutes")
 
 #----test page loads
