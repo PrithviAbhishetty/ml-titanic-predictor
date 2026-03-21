@@ -45,12 +45,14 @@ def wait_for_frontend():
 
 def test_page_loads(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     expect(page).to_have_title("Titanic Survival Predictor")
 
 #----test form fields are visible
 
 def test_form_fields_visible(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     expect(page.locator("select[name='pclass']")).to_be_visible()
     expect(page.locator("select[name='sex']")).to_be_visible()
     expect(page.locator("input[name='age']")).to_be_visible()
@@ -63,16 +65,19 @@ def test_form_fields_visible(page: Page):
 
 def test_pclass_dropdown_options(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     options = page.locator("select[name='pclass'] option").all_text_contents()
     assert options == ["1st Class", "2nd Class", "3rd Class"]
 
 def test_sex_dropdown_options(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     options = page.locator("select[name='sex'] option").all_text_contents()
     assert options == ["Female", "Male"]
 
 def test_embarked_dropdown_options(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     options = page.locator("select[name='embarked'] option").all_text_contents()
     assert options == ["Southampton", "Cherbourg", "Queenstown"]
 
@@ -80,6 +85,7 @@ def test_embarked_dropdown_options(page: Page):
 
 def test_predict_survived_happy_path(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.select_option("select[name='pclass']", "1")
     page.select_option("select[name='sex']", "female")
     page.fill("input[name='age']", "29")
@@ -93,6 +99,7 @@ def test_predict_survived_happy_path(page: Page):
 
 def test_predict_perished_happy_path(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.select_option("select[name='pclass']", "3")
     page.select_option("select[name='sex']", "male")
     page.fill("input[name='age']", "40")
@@ -106,11 +113,13 @@ def test_predict_perished_happy_path(page: Page):
 
 def test_loading_state_appears(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("CALCULATING FATE...")).to_be_visible(timeout=3000)
 
 def test_result_shows_probability(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("Survival Probability")).to_be_visible(timeout=10000)
 
@@ -119,23 +128,27 @@ def test_result_shows_probability(page: Page):
 def test_backend_down_shows_error(page: Page):
     page.route("**/predict", lambda route: route.abort())
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("Failed to connect to the prediction API")).to_be_visible(timeout=5000)
 
 def test_invalid_data_shows_validation_error(page: Page):
     page.route("**/predict", lambda route: route.fulfill(status=422))
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=5000)
 
 def test_negative_fare_shows_validation_error(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.fill("input[name='fare']", "-50")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=10000)
 
 def test_out_of_range_age_shows_validation_error(page: Page):
     page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
     page.fill("input[name='age']", "200")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=10000)
