@@ -97,11 +97,11 @@ jobs:
                 E2E_BASE_URL: ${{ steps.vercel-url.outputs.url }}?x-vercel-protection-bypass=${{ secrets.VERCEL_BYPASS_SECRET }}
                 E2E_BACKEND_URL: https://ml-titanic-predictor-staging.onrender.com
               run: |
-                uv run pytest tests/test_e2e.py -v
+                uv run pytest tests/test_e2e.py -v -s
 
             - name: Upload Playwright screenshot
               if: github.event_name == 'pull_request' && always()
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v6
               with:
                 name: playwright-screenshot
                 path: screenshot.png
