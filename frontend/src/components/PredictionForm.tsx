@@ -64,7 +64,11 @@ export default function PredictionForm({ onResult, onLoading, onError }: Props) 
       const result = await predictSurvival(form)
       onResult(result)
     } catch (err) {
-      onError('Failed to connect to the prediction API. Make sure the backend is running.')
+      if (err instanceof Error && err.message.includes('422')) {
+        onError('Invalid passenger data. Please check your inputs.')
+      } else {
+        onError('Failed to connect to the prediction API. Make sure the backend is running.')
+      }
     } finally {
       onLoading(false)
     }
