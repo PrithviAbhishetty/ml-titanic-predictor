@@ -12,7 +12,7 @@ BACKEND_URL = os.environ.get("E2E_BACKEND_URL", "http://localhost:8000")
 @pytest.fixture(scope="session", autouse=True)
 def warmup_backend():
     print(f"\nWarming up backend at {BACKEND_URL}")
-    for _ in range(12):
+    for i in range(12):
         try:
             response = httpx.get(f"{BACKEND_URL}/health", timeout=10)
             if response.status_code == 200:
@@ -20,8 +20,26 @@ def warmup_backend():
                 return
         except:
             pass
+        print(f"Attempt {i+1}: Backend not ready, waiting 15s...")
         time.sleep(15)
     raise RuntimeError("Failed to warm up within 3 minutes.")
+
+#----wait for frontend to be ready
+
+@pytest.fixture(scope="session", autouse=True)
+def wait_for_frontend():
+    print(f"\nWaiting for frontend at {BASE_URL}...")
+    for i in range(8):
+        try:
+            response = httpx.get(BASE_URL, timeout=10)
+            if response.status_code == 200:
+                print("Frontend is ready")
+                return
+        except Exception:
+            pass
+        print(f"Attempt {i+1}: Frontend not ready, waiting 15s...")
+        time.sleep(15)
+    raise RuntimeError("Frontend failed to become ready within 2 minutes")
 
 #----test page loads
 
