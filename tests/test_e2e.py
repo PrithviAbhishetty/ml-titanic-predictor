@@ -6,6 +6,18 @@ from playwright.sync_api import Page, expect
 
 BASE_URL = os.environ.get("E2E_BASE_URL", "http://localhost:5173")
 BACKEND_URL = os.environ.get("E2E_BACKEND_URL", "http://localhost:8000")
+VERCEL_BYPASS_SECRET = os.environ.get("VERCEL_BYPASS_SECRET", "")
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    if VERCEL_BYPASS_SECRET:
+        return {
+            **browser_context_args,
+            "extra_http_headers": {
+                "x-vercel-protection-bypass": VERCEL_BYPASS_SECRET
+            }
+        }
+    return browser_context_args
 
 #----warm up backend
 

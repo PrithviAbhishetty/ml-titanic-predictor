@@ -94,8 +94,9 @@ jobs:
             - name: Run E2E tests
               if: github.event_name == 'pull_request'
               env:
-                E2E_BASE_URL: ${{ steps.vercel-url.outputs.url }}?x-vercel-protection-bypass=${{ secrets.VERCEL_BYPASS_SECRET }}
+                E2E_BASE_URL: ${{ steps.vercel-url.outputs.url }}
                 E2E_BACKEND_URL: https://ml-titanic-predictor-staging.onrender.com
+                VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
               run: |
                 uv run pytest tests/test_e2e.py -v -s
 
