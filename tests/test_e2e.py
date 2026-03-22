@@ -8,16 +8,22 @@ BASE_URL = os.environ.get("E2E_BASE_URL", "http://localhost:5173")
 BACKEND_URL = os.environ.get("E2E_BACKEND_URL", "http://localhost:8000")
 VERCEL_BYPASS_SECRET = os.environ.get("VERCEL_BYPASS_SECRET", "")
 
-@pytest.fixture(scope="session")
-def browser_context_args(browser_context_args):
+@pytest.fixture(autouse=True)
+def add_bypass_routing(page):
     if VERCEL_BYPASS_SECRET:
-        return {
-            **browser_context_args,
-            "extra_http_headers": {
-                "x-vercel-protection-bypass": VERCEL_BYPASS_SECRET
-            }
-        }
-    return browser_context_args
+        from urllib.parse import urlparse
+        vercel_host = urlparse(BASE_URL).netloc
+
+        def handle_route(route):
+            req_host = urlparse(route.request.url).netloc
+            if req_host == vercel_host:
+                headers = dict(route.request.headers)
+                headers["x-vercel-protection-bypass"] = VERCEL_BYPASS_SECRET
+                route.continue_(headers=headers)
+            else:
+                route.continue_()
+
+        page.route("**/*", handle_route)
 
 #----warm up backend
 
