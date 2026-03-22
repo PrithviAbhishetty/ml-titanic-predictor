@@ -15,7 +15,7 @@ app.add_middleware(
     allow_origin_regex=r"https://ml-titanic-predictor.*\.vercel\.app|http://localhost:5173",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_headers=["Content-Type", "Authorization", "x-vercel-protection-bypass"],
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
