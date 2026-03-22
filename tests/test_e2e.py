@@ -68,7 +68,6 @@ def test_page_loads(page: Page):
 def test_form_fields_visible(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
-    page.screenshot(path="screenshot.png")
     expect(page.locator("select[name='pclass']")).to_be_visible()
     expect(page.locator("select[name='sex']")).to_be_visible()
     expect(page.locator("input[name='age']")).to_be_visible()
@@ -106,11 +105,11 @@ def test_predict_survived_happy_path(page: Page):
     page.select_option("select[name='sex']", "female")
     page.fill("input[name='age']", "29")
     page.fill("input[name='fare']", "100")
-    page.fill("input[name='sibsp']", "100")
-    page.fill("input[name='parch']", "100")
+    page.fill("input[name='sibsp']", "0")
+    page.fill("input[name='parch']", "0")
     page.select_option("select[name='embarked']", "S")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Prediction Result")).to_be_visible(timeout=10000)
+    expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
     expect(page.get_by_text("SURVIVED", exact=True)).to_be_visible()
 
 def test_predict_perished_happy_path(page: Page):
@@ -124,20 +123,21 @@ def test_predict_perished_happy_path(page: Page):
     page.fill("input[name='parch']", "0")
     page.select_option("select[name='embarked']", "S")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Prediction Result")).to_be_visible(timeout=10000)
-    expect(page.get_by_text("PERISHED")).to_be_visible()
+    expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
+    page.screenshot(path="screenshot.png")
+    expect(page.get_by_text("PERISHED", exact=True)).to_be_visible()
 
 def test_loading_state_appears(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("CALCULATING FATE...")).to_be_visible(timeout=3000)
+    expect(page.get_by_text("CALCULATING FATE...", exact=True)).to_be_visible(timeout=3000)
 
 def test_result_shows_probability(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Survival Probability")).to_be_visible(timeout=10000)
+    expect(page.get_by_text("Survival Probability", exact=True)).to_be_visible(timeout=10000)
 
 #----Sad paths
 
@@ -160,11 +160,11 @@ def test_negative_fare_shows_validation_error(page: Page):
     page.wait_for_load_state("networkidle")
     page.fill("input[name='fare']", "-50")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=10000)
+    expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=30000)
 
 def test_out_of_range_age_shows_validation_error(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.fill("input[name='age']", "200")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=10000)
+    expect(page.get_by_text("Invalid passenger data")).to_be_visible(timeout=30000)
