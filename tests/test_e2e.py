@@ -130,8 +130,9 @@ def test_loading_state_appears(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
-    page.screenshot(path="screenshot.png")
     expect(page.get_by_text("CALCULATING FATE...", exact=True)).to_be_visible(timeout=3000)
+    time.sleep(5)
+    page.screenshot(path="screenshot.png")
 
 def test_result_shows_probability(page: Page):
     page.goto(BASE_URL)
