@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# frontend/
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend for the Titanic survival predictor. Provides a passenger input form and renders the predicted survival outcome and probability returned by the FastAPI backend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Structure
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+frontend/
+├── src/
+│   ├── App.tsx                    # Root component — state management, layout
+│   ├── components/
+│   │   ├── PredictionForm.tsx     # Passenger input form + submit handler
+│   │   └── PredictionResult.tsx  # Survival outcome display
+│   ├── api/
+│   │   └── predict.ts            # fetch wrapper for POST /predict
+│   ├── utils/
+│   │   └── errors.ts             # Error normalisation — userMessage / devMessage
+│   ├── types/
+│   │   └── passenger.ts          # PassengerInput and PredictionOutput types
+│   └── index.css                 # Global styles and CSS variables
+└── public/
+    └── titanic.svg
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Error Handling
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+API errors are normalised in `utils/errors.ts` into an `AppError` shape with two fields:
+
+- `userMessage` — displayed in the UI (friendly, no technical detail)
+- `devMessage` — logged to `console.error` (status codes, raw error messages)
+
+This separation ensures implementation details never surface to users while keeping developer-relevant context accessible in the browser console.
+
+---
+
+## Environment Variables
+
+| Variable | Value |
+|----------|-------|
+| `VITE_API_URL` | URL of the FastAPI backend |
+
+For local development, create `frontend/.env.local`:
 ```
+VITE_API_URL=http://localhost:8000
+```
+
+On Vercel:
+- Production: `https://ml-titanic-predictor.onrender.com`
+- Preview: `https://ml-titanic-predictor-staging.onrender.com`
+
+---
+
+## Running Locally
+
+```bash
+npm install --prefix frontend
+npm run dev --prefix frontend
+```
+
+Requires `frontend/.env.local` with `VITE_API_URL` set. Backend must be running for predictions to work.
+
+---
+
+## Build
+
+```bash
+npm run build --prefix frontend
+```
+
+Output goes to `frontend/dist/`. Vercel handles this automatically on deploy.
