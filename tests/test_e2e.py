@@ -151,7 +151,7 @@ def test_backend_down_shows_error(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Failed to connect to the prediction API")).to_be_visible(timeout=5000)
+    expect(page.get_by_text("Unable to reach the prediction service")).to_be_visible(timeout=5000)
 
 def test_invalid_data_shows_validation_error(page: Page):
     page.route("**/predict", lambda route: route.fulfill(status=422))

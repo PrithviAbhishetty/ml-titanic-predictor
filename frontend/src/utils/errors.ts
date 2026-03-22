@@ -6,7 +6,7 @@ export interface AppError {
 export function parseApiError(err: unknown, status?: number): AppError {
   if (status === 422) {
     return {
-      userMessage: 'Some passenger details appear invalid. Please check your inputs and try again.',
+      userMessage: 'Invalid passenger data. Please check your inputs and try again.',
       devMessage: `422 Unprocessable Entity — validation failed on /predict`,
     }
   }
