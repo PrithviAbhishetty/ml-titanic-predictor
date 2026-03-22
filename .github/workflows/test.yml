@@ -99,10 +99,4 @@ jobs:
                 VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
               run: |
                 uv run pytest tests/test_e2e.py -v -s
-
-            - name: Upload Playwright screenshot
-              if: github.event_name == 'pull_request' && always()
-              uses: actions/upload-artifact@v6
-              with:
-                name: playwright-screenshot
-                path: screenshot.png
+                

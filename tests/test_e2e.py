@@ -50,7 +50,7 @@ def wait_for_frontend():
     headers = {}
     if VERCEL_BYPASS_SECRET:
         headers["x-vercel-protection-bypass"] = VERCEL_BYPASS_SECRET
-    for i in range(24):
+    for i in range(8):
         try:
             response = httpx.get(BASE_URL, timeout=10, headers=headers, follow_redirects=False)
             if response.status_code == 200:
@@ -58,8 +58,8 @@ def wait_for_frontend():
                 return
         except Exception:
             pass
-        print(f"Attempt {i+1}: Frontend not ready, waiting 5s...")
-        time.sleep(5)
+        print(f"Attempt {i+1}: Frontend not ready, waiting 15s...")
+        time.sleep(15)
     raise RuntimeError("Frontend failed to become ready within 2 minutes")
 
 #----test page loads
@@ -105,11 +105,6 @@ def test_embarked_dropdown_options(page: Page):
 #----Happy paths
 
 def test_predict_survived_happy_path(page: Page):
-    # Capture browser console messages
-    messages = []
-    page.on("console", lambda msg: messages.append(f"{msg.type}: {msg.text}"))
-    page.on("pageerror", lambda err: messages.append(f"ERROR: {err}"))
-
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.select_option("select[name='pclass']", "1")
@@ -120,8 +115,6 @@ def test_predict_survived_happy_path(page: Page):
     page.fill("input[name='parch']", "0")
     page.select_option("select[name='embarked']", "S")
     page.get_by_role("button", name="Predict Survival").click()
-    page.wait_for_timeout(5000)
-    print(f"\nConsole messages: {messages}")
     expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
     expect(page.get_by_text("SURVIVED", exact=True)).to_be_visible()
 
@@ -144,8 +137,6 @@ def test_loading_state_appears(page: Page):
     page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("CALCULATING FATE...", exact=True)).to_be_visible(timeout=3000)
-    time.sleep(5)
-    page.screenshot(path="screenshot.png")
 
 def test_result_shows_probability(page: Page):
     page.goto(BASE_URL)
