@@ -99,6 +99,11 @@ def test_embarked_dropdown_options(page: Page):
 #----Happy paths
 
 def test_predict_survived_happy_path(page: Page):
+    # Capture browser console messages
+    messages = []
+    page.on("console", lambda msg: messages.append(f"{msg.type}: {msg.text}"))
+    page.on("pageerror", lambda err: messages.append(f"ERROR: {err}"))
+
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.select_option("select[name='pclass']", "1")
@@ -110,6 +115,7 @@ def test_predict_survived_happy_path(page: Page):
     page.select_option("select[name='embarked']", "S")
     page.get_by_role("button", name="Predict Survival").click()
     expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
+    print(f"\nConsole messages: {messages}")
     expect(page.get_by_text("SURVIVED", exact=True)).to_be_visible()
 
 def test_predict_perished_happy_path(page: Page):
