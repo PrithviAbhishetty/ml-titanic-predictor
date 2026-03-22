@@ -123,8 +123,6 @@ def test_predict_perished_happy_path(page: Page):
     page.fill("input[name='parch']", "0")
     page.select_option("select[name='embarked']", "S")
     page.get_by_role("button", name="Predict Survival").click()
-    time.sleep(5)
-    page.screenshot(path="screenshot.png")
     expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
     expect(page.get_by_text("PERISHED", exact=True)).to_be_visible()
 
@@ -132,6 +130,7 @@ def test_loading_state_appears(page: Page):
     page.goto(BASE_URL)
     page.wait_for_load_state("networkidle")
     page.get_by_role("button", name="Predict Survival").click()
+    page.screenshot(path="screenshot.png")
     expect(page.get_by_text("CALCULATING FATE...", exact=True)).to_be_visible(timeout=3000)
 
 def test_result_shows_probability(page: Page):
