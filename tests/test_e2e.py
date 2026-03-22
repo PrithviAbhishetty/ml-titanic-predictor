@@ -40,7 +40,7 @@ def warmup_backend():
 
 @pytest.fixture(scope="session", autouse=True)
 def wait_for_frontend():
-    print(f"\nWaiting for frontend at {BASE_URL}...")
+    print(f"\nWaiting for frontend at {BASE_URL}")
     headers = {}
     if VERCEL_BYPASS_SECRET:
         headers["x-vercel-protection-bypass"] = VERCEL_BYPASS_SECRET
@@ -114,8 +114,9 @@ def test_predict_survived_happy_path(page: Page):
     page.fill("input[name='parch']", "0")
     page.select_option("select[name='embarked']", "S")
     page.get_by_role("button", name="Predict Survival").click()
-    expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
+    page.wait_for_timeout(5000)
     print(f"\nConsole messages: {messages}")
+    expect(page.get_by_text("Prediction Result", exact=True)).to_be_visible(timeout=10000)
     expect(page.get_by_text("SURVIVED", exact=True)).to_be_visible()
 
 def test_predict_perished_happy_path(page: Page):
