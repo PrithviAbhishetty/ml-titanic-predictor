@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { PassengerInput, PredictionOutput } from '../types/passenger'
 import { predictSurvival } from '../api/predict'
+import type { AppError } from '../api/predict'
 
 interface Props {
   onResult: (result: PredictionOutput) => void
@@ -64,7 +65,9 @@ export default function PredictionForm({ onResult, onLoading, onError }: Props) 
       const result = await predictSurvival(form)
       onResult(result)
     } catch (err) {
-      onError('Failed to connect to the prediction API. Make sure the backend is running.')
+      const appErr = err as AppError
+      console.error(appErr.devMessage)
+      onError(appErr.userMessage)
     } finally {
       onLoading(false)
     }
